@@ -45,23 +45,22 @@ class GenerateInvalidRequestWithCommonValidation:
 
         # get dataclass fields
         required_fields, init_fields, field_types = self._get_dataclass_fields_info()
-        correct_field_types = field_types.copy()
         
         #check if there are some wrong or missing fields
         missing_fields,wrong_fields,incorrect_field_types = self._compare_fields_with_dict(required_fields, init_fields,field_types)
         
         #add errors for fields with wrong parametery type
         for field,type in incorrect_field_types.items():
-            invalid_req.add_error(field, f'This field has a wrong parameter type. It was declared as {type.__name__}, but it should be {correct_field_types[field].__name__}')
+            invalid_req.add_error(field, f'Field {field} has a wrong parameter type. It was declared as {type.__name__}, but it should be {field_types[field].__name__}')
 
         # if there are some wrong or missing fields, add messages 
         if len(missing_fields) > 0 : 
             for key in missing_fields:
-                invalid_req.add_error(key, 'This field is required, but was not included as a parameter')
+                invalid_req.add_error(key, f'Field {key} is required, but was not included as a parameter')
         
         if len(wrong_fields) > 0 : 
             for key in wrong_fields:
-                invalid_req.add_error(key, 'This field does not belong to the parameters')
+                invalid_req.add_error(key, f'Field {key} does not belong to the parameters')
         
         return invalid_req
 
@@ -103,7 +102,7 @@ class GenerateInvalidRequestWithCommonValidation:
         """
         wrong_fields =[]
         missing_fields = required_fields
-        incorrect_field_types = field_types
+        incorrect_field_types = {}
 
         dic = self.dictionary_for_object_generation
 
@@ -116,8 +115,8 @@ class GenerateInvalidRequestWithCommonValidation:
             if key in required_fields:
                 missing_fields.remove(key)
 
-            if isinstance(value,incorrect_field_types[key]): 
-                incorrect_field_types.pop(key)
+            if not isinstance(value,field_types[key]): 
+                incorrect_field_types[key] = type(value)
                         
         return missing_fields,wrong_fields, incorrect_field_types
     

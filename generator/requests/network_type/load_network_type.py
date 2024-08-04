@@ -24,23 +24,24 @@ class LoadNetworkTypeRequestObject(LoadNetworkTypeInputDto):
         invalid_req = GenerateInvalidRequestWithCommonValidation(cls,adict).execute()
         
         #check differences between common data
-        common_data_diff = cls.accepted_common_data_keys.difference(set(adict["common_data"].keys()))
+        if "common_data" in adict.keys():
+            common_data_diff = cls.accepted_common_data_keys.difference(set(adict["common_data"].keys()))
+        
+            if common_data_diff:
+                for key in common_data_diff:
+                    if key in cls.accepted_common_data_keys:
+                        invalid_req.add_error(
+                            'common data',
+                            'Field {} is required, but was not included as a parameter'.format(key)
+                        )
+                    else:
+                        invalid_req.add_error(
+                            'common data',
+                            'Field {} cannot be used'.format(key)
+                        )
 
-        if common_data_diff:
-            for key in common_data_diff:
-                if key in cls.accepted_common_data_keys:
-                    invalid_req.add_error(
-                        'common data',
-                        'Field {} is required, but was not included as a parameter'.format(key)
-                    )
-                else:
-                    invalid_req.add_error(
-                        'common data',
-                        'Field {} cannot be used'.format(key)
-                    )
-
-        for field, value in adict["common_data"].items():
-            if not isinstance(value,Mapping):
+            for field, value in adict["common_data"].items():
+                if not isinstance(value,Mapping):
                     invalid_req.add_error(
                     'common data',
                     'Field {} is not a dictionary'.format(field)

@@ -7,6 +7,7 @@ from generator.responses.responses import ResponseTypes
 def update_network_type_use_case(request,repo):
     if not request :
         return build_response_from_invalid_request(request)
+    
     try:
         repo.update(request.data)
         return  UpdateNetworkTypeResponseSuccess()

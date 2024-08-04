@@ -47,27 +47,27 @@ class MongoRepo(Repo):
         return entity_object.from_dict(convert_results_to_entity_dict(result))
 
     
-    def create(self, entities):
+    def create(self, requests):
         """create specific entity with provided data"""
         collection = self.collection()
 
         collection.insert_many([
 
-            {entity.to_dict()}
-            for entity in entities
+            request.to_dict()
+            for request in requests
             
             ] 
         )
 
         
      
-    def update(self, entity):
+    def update(self, requests):
         """ update entity using entity id"""
         collection = self.collection()
         
         collection.update_one(
-            {"_id":entity.id},
-            {"$set" : entity.to_dict()}
+            {"_id":requests.id},
+            {"$set" : requests.to_dict()}
             )
     
     def _create_entity_objects(self,result):

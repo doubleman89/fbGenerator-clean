@@ -1,6 +1,8 @@
 import pytest
+from collections import UserDict
+from dataclasses import asdict
 
-from generator.requests.network_type.load_network_type import LoadNetworkTypeRequestObject
+from generator.requests.network_type.create_network_type import CreateNetworkTypeRequestObject
 
 
 
@@ -15,20 +17,20 @@ wrong_network_type_dict ={
 
 }
 
-wrong_network_type_dict2 ={
+
+correct_network_type_dict ={
     "name" : "ok",
     "version" : "0.1",
     "comment" : "blablab",
-    "tags" : {""},
+    "tags" : {"d":"sd"},
     "rows" : [],
-    "common_data" : {"srs":[]},
+    "common_data" : {"stat":UserDict({"d":"534"}), "temp":{"fsd":"sdsd"}},
 
 }
 
-
 @pytest.mark.parametrize("data", [wrong_network_type_dict])
-def test_load_network_type_request_with_invalid_data(data):
-    request = LoadNetworkTypeRequestObject.from_dict(data)
+def test_create_network_type_request_with_invalid_data(data):
+    request = CreateNetworkTypeRequestObject.from_dict(data)
 
     assert request.has_errors()
     assert request.errors[0]["parameter"] == "tags"
@@ -41,8 +43,8 @@ def test_load_network_type_request_with_invalid_data(data):
     assert bool(request) is False
 
 @pytest.mark.parametrize("data", [{}])
-def test_load_network_type_request_with_empty_data(data):
-    request = LoadNetworkTypeRequestObject.from_dict(data)
+def test_create_network_type_request_with_empty_data(data):
+    request = CreateNetworkTypeRequestObject.from_dict(data)
     keys = list(wrong_network_type_dict.keys())
 
     assert request.has_errors()
@@ -51,4 +53,12 @@ def test_load_network_type_request_with_empty_data(data):
         assert request.errors[i]["message"] == f'Field {str(keys[i])} is required, but was not included as a parameter'
 
     assert bool(request) is False
+
+
+@pytest.mark.parametrize("data", [correct_network_type_dict])
+def test_create_network_type_request_with_correct_data(data):
+    request = CreateNetworkTypeRequestObject.from_dict(data)
+
+    assert vars(request) == data
+    assert bool(request) is True
 

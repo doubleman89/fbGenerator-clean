@@ -6,7 +6,7 @@ from generator.requests.requests import ValidRequestObject,GenerateInvalidReques
 
 
 @dataclass
-class LoadNetworkTypeInputDto(ValidRequestObject): 
+class CreateNetworkTypeInputDto(ValidRequestObject): 
     name : str
     version : str
     comment : str
@@ -14,7 +14,7 @@ class LoadNetworkTypeInputDto(ValidRequestObject):
     rows : list[list]
     common_data : dict[str, dict]
 
-class LoadNetworkTypeRequestObject(LoadNetworkTypeInputDto):
+class CreateNetworkTypeRequestObject(CreateNetworkTypeInputDto):
     accepted_common_data_keys : ClassVar[set] = {"stat","temp"}
 
     @classmethod
@@ -50,4 +50,4 @@ class LoadNetworkTypeRequestObject(LoadNetworkTypeInputDto):
         if invalid_req.has_errors():
             return invalid_req
 
-        return cls(**adict)
+        return CreateNetworkTypeInputDto(**adict)
